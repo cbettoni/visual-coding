@@ -16,9 +16,15 @@ const sketch = () => {
     const w = width * 0.3;
     const h = height * 0.3;
 
+    context.save();
+    context.translate(x, y);
+    context.rotate(0.3);
+
     context.beginPath();
-    context.rect(x, y, w, h);
+    context.rect(-w * 0.5, -h * 0.5, w, h);
     context.fill();
+    context.restore();
+
   };
 };
 
