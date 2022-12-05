@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "canvas-sketch-cli": "^1.11.20",
-    "core-js": "^3.26.1"
-  }
-}
