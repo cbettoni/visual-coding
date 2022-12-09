@@ -1,11 +1,14 @@
 const canvasSketch = require('canvas-sketch');
+const random = require('canvas-sketch-util/random');
+const math = require('canvas-sketch-util/math');
 
 const settings = {
-  dimensions: [ 1080, 1080 ]
+  dimensions: [ 1080, 1080 ],
+  animate: true
 };
 
 const sketch = () => {
-  return ({ context, width, height }) => {
+  return ({ context, width, height, frame }) => {
     context.fillStyle = 'white';
     context.fillRect(0, 0, width, height);
 
@@ -29,12 +32,18 @@ const sketch = () => {
       const w = cellw * 0.8;
       const h = cellh * 0.8;
 
+      const n = random.noise2D(x + frame * 10, y, 0.001); //see simplex-noise in the doc od canvas-sketch-util
+      const angle = n * Math.PI * 0.2; //angle of the rotation of the lines on the grid (-180 deg to 180 deg)
+      //const scale = (n + 1) / 2 * 30;//use the noise to change the scale of the lines which is btwn -1  & 1 (we don`t want neg scale si we remaping to be between 0 and 1)
+      const scale = math.mapRange(n, -1, 1, 1, 30);
+
       context.save(); //saves the current drawing state of the canvas by pushing it onto a stack
       context.translate(x, y); //remaps the (0,0) position on the canvas
       context.translate(margx, margy); //remaps the (0,0) position on the canvas taking margins on count
       context.translate(cellw * 0.5, cellh * 0.5); //remaps the (0,0) position on the canvas taking the center of the cells on count
+      context.rotate(angle); //see the angle rotation of the noise
 
-      context.lineWidth = 4;
+      context.lineWidth = scale;
 
       context.beginPath(); //begins a path, or resets the current path
       context.moveTo(w * -0.5, 0); //minus half of the w of the line
