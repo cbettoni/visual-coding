@@ -12,6 +12,13 @@ const settings = {
 const params = {
   cols: 10,
   rows: 10,
+  scaleMin: 1,
+  scaleMax: 30,
+  freq: 0.001,
+  amp: 0.2,
+  frame: 0, //button animate or not
+  animate: true,
+  lineCap: 'butt', //form of the line
 };
 
 const sketch = () => {
@@ -39,10 +46,14 @@ const sketch = () => {
       const w = cellw * 0.8;
       const h = cellh * 0.8;
 
-      const n = random.noise2D(x + frame * 10, y, 0.001); //see simplex-noise in the doc od canvas-sketch-util
-      const angle = n * Math.PI * 0.2; //angle of the rotation of the lines on the grid (-180 deg to 180 deg)
+      const f = params.animate ? frame /* istrue? */ : params.frame /* else */; //ternary operator if the frame is animate or not
+
+      //const n = random.noise2D(x + frame * 10, y, params.freq); //see simplex-noise in the doc od canvas-sketch-util
+      const n = random.noise3D(x, y, f * 10, params.freq); //3D = more organic pattern
+
+      const angle = n * Math.PI * params.amp; //angle of the rotation of the lines on the grid (-180 deg to 180 deg)
       //const scale = (n + 1) / 2 * 30;//use the noise to change the scale of the lines which is btwn -1  & 1 (we don`t want neg scale si we remaping to be between 0 and 1)
-      const scale = math.mapRange(n, -1, 1, 1, 30);
+      const scale = math.mapRange(n, -1, 1, params.scaleMin, params.scaleMax); //scale min & max of the GUI
 
       context.save(); //saves the current drawing state of the canvas by pushing it onto a stack
       context.translate(x, y); //remaps the (0,0) position on the canvas
@@ -51,6 +62,7 @@ const sketch = () => {
       context.rotate(angle); //see the angle rotation of the noise
 
       context.lineWidth = scale;
+      context.lineCap = params.lineCap; //form of the line
 
       context.beginPath(); //begins a path, or resets the current path
       context.moveTo(w * -0.5, 0); //minus half of the w of the line
@@ -65,9 +77,20 @@ const sketch = () => {
 const createPane = () => { //create GUI (graphic interface)
   const pane = new Tweakpane.Pane();
 
+  //modify the grid values:
   folder = pane.addFolder({ title: 'Grid '});
-  folder.addInput(params, 'cols', { min: 2, max: 50, step: 1}); //sliders from 2 to 50
-  folder.addInput(params, 'rows', { min: 2, max: 50, step: 1}); //sliders from 2 to 50
+  folder.addInput(params, 'lineCap', { options: {butt: 'butt', round: 'round', square: 'square'} }); //form of the line with DD menu
+  folder.addInput(params, 'cols', { min: 2, max: 50, step: 1 }); //sliders from 2 to 50
+  folder.addInput(params, 'rows', { min: 2, max: 50, step: 1 });
+  folder.addInput(params, 'scaleMin', { min: 1, max: 100 });
+  folder.addInput(params, 'scaleMax', { min: 0, max: 100 });
+
+  //modify the noise values:
+  folder = pane.addFolder({ title: 'Noise '});
+  folder.addInput(params, 'freq', { min: -0.01, max: 0.01 });
+  folder.addInput(params, 'amp', { min: 0, max: 1 });
+  folder.addInput(params, 'animate' ); //animate button
+  folder.addInput(params, 'frame', { min: 0, max: 999 }); //frame button
 };
 
 createPane();
