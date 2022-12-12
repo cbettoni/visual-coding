@@ -8,13 +8,19 @@ const settings = {
   animate: true
 };
 
+//create object to store parameters of the GUI:
+const params = {
+  cols: 10,
+  rows: 10,
+};
+
 const sketch = () => {
   return ({ context, width, height, frame }) => {
     context.fillStyle = 'white';
     context.fillRect(0, 0, width, height);
 
-    const cols = 10;
-    const rows = 10;
+    const cols = params.cols; //use the GUI parameters
+    const rows = params.rows; //use the GUI parameters
     const numCells = cols * rows;
 
     const gridw = width * 0.8; //width of the grid: 80% width canvas
@@ -56,8 +62,12 @@ const sketch = () => {
   };
 };
 
-const createPane = () => {
+const createPane = () => { //create GUI (graphic interface)
   const pane = new Tweakpane.Pane();
+
+  folder = pane.addFolder({ title: 'Grid '});
+  folder.addInput(params, 'cols', { min: 2, max: 50, step: 1}); //sliders from 2 to 50
+  folder.addInput(params, 'rows', { min: 2, max: 50, step: 1}); //sliders from 2 to 50
 };
 
 createPane();
